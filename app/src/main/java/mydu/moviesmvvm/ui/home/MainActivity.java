@@ -14,6 +14,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import dagger.android.AndroidInjection;
 import mydu.moviesmvvm.R;
 import mydu.moviesmvvm.data.Response;
 import mydu.moviesmvvm.data.model.TopHeadLinesModel;
@@ -24,17 +25,22 @@ public class MainActivity extends BaseActivity implements MainActivityNavigator 
     ViewModelProvider.Factory mViewModelFactory;
 
     private MainActivityViewModel mViewModel;
+    TopHeadLinesModel topHeadLinesModel;
+
+    @Inject
+    Gson gson;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        AndroidInjection.inject(this);
 
         mViewModel = ViewModelProviders.of(this, mViewModelFactory).get(MainActivityViewModel.class);
         mViewModel.setNavigator(this);
-       /* mViewModel.getTopHeadLines();
-        mViewModel.getTopRatedResponse().observe(this, this::processTopRatedLinesResponse);*/
-       mViewModel.getMenuItems();
+        mViewModel.getTopHeadLines();
+        mViewModel.getTopRatedResponse().observe(this, this::processTopRatedLinesResponse);
+        //mViewModel.getMenuItems();
 
     }
 
@@ -47,8 +53,10 @@ public class MainActivity extends BaseActivity implements MainActivityNavigator 
 
             case SUCCESS:
                 hideProgress();
-                break;
 
+                topHeadLinesModel = gson.fromJson(response.data, new TypeToken<TopHeadLinesModel>() {
+                }.getType());
+                break;
             case ERROR:
                 hideProgress();
                 break;

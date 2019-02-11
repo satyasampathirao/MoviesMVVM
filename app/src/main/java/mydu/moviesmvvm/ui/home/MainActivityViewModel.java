@@ -1,21 +1,14 @@
 package mydu.moviesmvvm.ui.home;
 
 import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.ViewModel;
 import android.os.Handler;
 
-import java.util.List;
-
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
 import mydu.moviesmvvm.data.Response;
 import mydu.moviesmvvm.data.model.TopHeadLinesModel;
-import mydu.moviesmvvm.data.remote.ApiConstants;
 import mydu.moviesmvvm.data.remote.WebService;
 import mydu.moviesmvvm.rx.SchedulersFacade;
 import mydu.moviesmvvm.ui.base.BaseViewModel;
-import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 
@@ -25,8 +18,7 @@ public class MainActivityViewModel extends BaseViewModel<MainActivityNavigator> 
 
     private MutableLiveData<Response> topRatedResponse = new MutableLiveData<>();
 
-
-    public MainActivityViewModel(WebService webService, SchedulersFacade schedulersFacade) {
+    MainActivityViewModel(WebService webService, SchedulersFacade schedulersFacade) {
         super(webService, schedulersFacade);
     }
 
@@ -41,8 +33,8 @@ public class MainActivityViewModel extends BaseViewModel<MainActivityNavigator> 
 
     public void getTopHeadLines() {
         disposables.add(getWebClient().getTopHeadLines()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(getSchedulersFacade().io())
+                .observeOn(getSchedulersFacade().ui())
                 .doOnSubscribe(__ -> topRatedResponse.setValue(Response.loading()))
                 .subscribe(
                         greeting -> topRatedResponse.setValue(Response.success(greeting.toString())),
